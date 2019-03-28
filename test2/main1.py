@@ -15,20 +15,24 @@ import h5py
 # data = quandl.get('BCHARTS/KRAKENUSD', returns='pandas')
 # data.to_csv('btc.csv',sep='\t')
 
-look_back = 20
+look_back = 10
+tomorrow = datetime.datetime.today().strftime("%Y-%m-%d")
 
 def create_dataset(dataset, look_back):
     dataX, dataY = [], []
     for i in range(len(dataset) - look_back):
-        a = dataset[i:(i + look_back), 0]
+        a = dataset[i:(i + look_back)]
         dataX.append(a)
-        dataY.append(dataset[i + look_back, 0])
+        dataY.append(dataset[i + look_back])
     print(len(dataY))
     return np.array(dataX), np.array(dataY)
 
 deficit = 1
 
 data = pd.read_csv('btc.csv',sep='\t')
+data = data.append({'Date':tomorrow},ignore_index = True)
+fig = sns.heatmap(data.corr(), annot=True, cmap='RdYlGn', linewidths=0.1, vmin=0)
+pyplot.savefig('heatmap.png',dpi = 400)
 print(data.head())
 print(data.tail())
 
@@ -54,11 +58,14 @@ train_size = int(len(scaled) * 0.80)
 test_size = len(scaled) - train_size
 train, test = scaled[0:train_size,:], scaled[train_size:len(scaled),:]
 print("Train length: ",len(train),"\tTest length: ",len(test))
+print("train:", train[:5])
 
 trainX, trainY = create_dataset(train, look_back)
 testX, testY = create_dataset(test, look_back)
-# print(trainX[:5])
-# print(trainY[:5])
+print("trainX")
+print(trainX[:5])
+print("trainY")
+print(trainY[:5])
 
 trainX = np.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
 testX = np.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
@@ -89,19 +96,21 @@ model.add(Activation('relu'))
 
 opt = tf.keras.optimizers.Adam(lr = 0.001, decay = 1e-5)
 model.compile(loss='mae', optimizer=opt,metrics=['accuracy','mse'])
-history = model.fit(trainX, trainY, epochs=500, batch_size=1750, validation_data=(testX, testY), verbose=1, shuffle=False)
+history = model.fit(trainX, trainY, epochs=500, batch_size=1750, validation_data=(testX, testY), verbose=0, shuffle=False)
 
 score = model.evaluate(testX,testY,verbose = 1)
 print(model.metrics_names)
 print("score: ",score)
-pyplot.plot(history.history['loss'], label='train')
-pyplot.plot(history.history['val_loss'], label='test')
-pyplot.legend()
-pyplot.show()
+# pyplot.plot(history.history['loss'], label='train')
+# pyplot.plot(history.history['val_loss'], label='test')
+# pyplot.legend()
+# pyplot.show()
 
 # model.save('model1.hdf5')
 save_model(model,'./models/model.hdf5',overwrite = True,include_optimizer = True)
 # model.save_weights("model_weights.h5")
+print("testX shape:",testX.shape)
+print(testX[0])
 ypredicted = model.predict(testX)
 pyplot.plot(ypredicted, label='predict')
 pyplot.plot(testY, label='true')
@@ -110,6 +119,8 @@ pyplot.show()
 
 ypredicted = ypredicted[deficit:]
 ypredicted_inverse = scaler.inverse_transform(ypredicted.reshape(-1, 1))
+print('last price',ypredicted_inverse[-1])
+print('last second price',ypredicted_inverse[-2])
 testY_inverse = scaler.inverse_transform(testY.reshape(-1, 1))
 testY_inverse = testY_inverse[:-deficit]
 
@@ -138,9 +149,9 @@ print("\npercent change accuracy = ",100-pctChangeAccuracy,"%")
 # print('Test RMSE: %.3f' % rmse)
 
 
-pyplot.plot(ypredicted_inverse, label='predict')
-pyplot.plot(testY_inverse, label='actual', alpha=0.5)
-pyplot.legend()
+# pyplot.plot(ypredicted_inverse, label='predict')
+# pyplot.plot(testY_inverse, label='actual', alpha=0.5)
+# pyplot.legend()
 
 
 predictDates = data['Date'].tail(len(ypredicted_inverse))
@@ -156,5 +167,12 @@ ypredicted_reshape = ypredicted_inverse.reshape(len(ypredicted_inverse))
 
 
 sns.lineplot(x = predictDates, y = testY_reshape, label = 'Actual Price')
-sns.lineplot(x=predictDates, y=ypredicted_reshape, label= 'Predict Price')
+fig = sns.lineplot(x=predictDates, y=ypredicted_reshape, label= 'Predict Price')
+pyplot.savefig('./images/figure.png',dpi = 400)
 pyplot.show()
+
+
+
+price = model.predict(testX[[-1]])
+price  = scaler.inverse_transform(price.reshape(-1, 1))
+print("Forecasted price for tomorrow: ", price)
