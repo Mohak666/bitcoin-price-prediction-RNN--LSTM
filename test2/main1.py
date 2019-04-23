@@ -96,7 +96,7 @@ model.add(Activation('relu'))
 
 opt = tf.keras.optimizers.Adam(lr = 0.001, decay = 1e-5)
 model.compile(loss='mae', optimizer=opt,metrics=['accuracy','mse'])
-history = model.fit(trainX, trainY, epochs=500, batch_size=1750, validation_data=(testX, testY), verbose=0, shuffle=False)
+history = model.fit(trainX, trainY, epochs=500, batch_size=1750, validation_data=(testX, testY), verbose=1, shuffle=False)
 
 score = model.evaluate(testX,testY,verbose = 1)
 print(model.metrics_names)

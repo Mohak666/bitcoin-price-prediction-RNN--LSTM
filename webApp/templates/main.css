@@ -1,0 +1,21 @@
+h1,h2{
+text-align:center;
+}
+
+.large{
+  text-align:center;
+  font-size: 24;
+}
+
+.middle{
+  text-align:center;
+  font-size: 36;
+}
+
+#brand-img{
+  border-radius: 30%;
+}
+
+body{
+  background-color: blue;
+}

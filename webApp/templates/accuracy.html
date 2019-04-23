@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+  {% from 'macros.html' import head %}
+  <head>
+  {{ head() }}
+
+  </head>
+  <div class="jumbotron">
+    <h1 class="display-4">Predictions are accurate upto 80%</h1>
+    <p class="lead">Our Project is based on a comparative study between two different Recurrent Neural Network</p>
+    <p class="lead"> Namely, LSTM(Long Short Term Memory) and GRU(Gated Recurrent Unit)</p>
+    <hr class="my-4">
+    <p>Checkout These graphs for more info.</p>
+  </div>
+
+  <body>
+    <div class ='container' >
+      <div class = 'row'>
+        <div class = 'col-md-10'>
+          <h1>LSTM</h1>
+          <img src = './static/lstm.png' class='img-fluid'  ></img>
+          <p><strong>The predicted accuracy is : {{ lAcc }}</strong></p>
+          <p><strong>The predicted precentage change accuracy is : {{ lPctAcc }}</strong></p>
+        </div>
+        <p></p><p></p><p></p><p></p>
+        <div class = 'col-md-10'>
+          <h1>GRU</h1>
+          <img src = './static/gru.png' class='img-fluid' ></img>
+          <p><strong>The predicted accuracy is : {{ gAcc }}</strong></p>
+          <p><strong>The predicted precentage change accuracy is : {{ gPctAcc }}</strong></p>
+        </div>
+      </div>
+    </div>
+    <hr class="my-4">
+    <p class="lead">
+      <a class="btn btn-primary btn-lg" href="#" role="button">Home</a>
+    </p>
+  </body>
+</html>
