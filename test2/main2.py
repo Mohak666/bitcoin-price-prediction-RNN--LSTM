@@ -9,7 +9,6 @@ from tensorflow.keras.models import Sequential, save_model
 from tensorflow.keras.layers import Dense,Dropout,GRU,Activation
 import numpy as np
 import seaborn as sns
-import h5py
 
 # import quandl
 # data = quandl.get('BCHARTS/KRAKENUSD', returns='pandas')
@@ -76,15 +75,7 @@ print(trainX[0])
 
 print("shape: ",trainX.shape)
 model = Sequential()
-# model.add(LSTM(128, input_shape=(trainX.shape[1], trainX.shape[2]), return_sequences = True))
-# model.add(Dropout(0.2))
-# model.add(BatchNormalization())
-#
-# model.add(LSTM(128, return_sequences = True,activation = "relu"))
-# model.add(Dropout(0.25))
-# model.add(BatchNormalization())
-#
-# model.add(Dense(1,activation = 'softmax'))
+
 model.add(GRU(50,input_shape = trainX[0].shape,
     return_sequences=True))
 model.add(Dropout(0.35))
